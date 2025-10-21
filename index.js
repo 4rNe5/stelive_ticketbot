@@ -26,9 +26,10 @@ const retryWithBackoff = async (fn, maxRetries = 4, baseDelay = 1000) => {
                 throw new Error('Server returned HTML error page (likely overloaded)');
             }
 
-            // If status is 500, retry
-            if (result.status === 500) {
-                throw new Error(`Server returned 500 error`);
+            // Retryable status codes (500, 423, 502, 503, 504)
+            const retryableStatuses = [423, 500, 502, 503, 504];
+            if (retryableStatuses.includes(result.status)) {
+                throw new Error(`Server returned ${result.status} error (${result.status === 423 ? 'Locked/Bot Detection' : 'Server Error'})`);
             }
 
             // If status is not 200, throw error
@@ -79,11 +80,21 @@ const retryWithBackoff = async (fn, maxRetries = 4, baseDelay = 1000) => {
                 v: "1",
             },
             headers: {
-                "Content-Type": "application/x-www-form-urlencoded",
                 "Accept": "application/json, text/javascript, */*; q=0.01",
-                "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+                "Accept-Language": "ko-KR,ko;q=0.9,en-US;q=0.8,en;q=0.7",
+                "Accept-Encoding": "gzip, deflate, br",
+                "Content-Type": "application/x-www-form-urlencoded; charset=UTF-8",
+                "Origin": "https://ticket.melon.com",
+                "Referer": `https://ticket.melon.com/performance/index.htm?prodId=${productId}`,
+                "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36",
                 "X-Requested-With": "XMLHttpRequest",
-                "Referer": `http://ticket.melon.com/performance/index.htm?prodId=${productId}`,
+                "Sec-Fetch-Dest": "empty",
+                "Sec-Fetch-Mode": "cors",
+                "Sec-Fetch-Site": "same-origin",
+                "Cache-Control": "no-cache",
+                "Pragma": "no-cache",
+                "Connection": "keep-alive",
+                "DNT": "1",
             },
             data: qs.stringify({
                 prodId: productId,
