@@ -1,5 +1,4 @@
 import * as core from "@actions/core";
-import { IncomingWebhook } from "@slack/webhook";
 import axios from "axios";
 import * as qs from "querystring";
 
@@ -9,7 +8,7 @@ import * as qs from "querystring";
     "product-id",
     "schedule-id",
     "seat-id",
-    "slack-incoming-webhook-url",
+    "discord-webhook-url",
   ].map((name) => {
     const value = core.getInput(name);
     if (!value) {
@@ -20,8 +19,6 @@ import * as qs from "querystring";
   });
 
   const message = core.getInput("message") ?? "티켓사세요";
-
-  const webhook = new IncomingWebhook(webhookUrl);
 
   const res = await axios({
     method: "POST",
@@ -46,7 +43,13 @@ import * as qs from "querystring";
       prodId: productId,
     })}`;
 
-    await webhook.send(`${message} ${link}`);
+    // Send Discord webhook notification
+    await axios.post(webhookUrl, {
+      content: `${message} ${link}`,
+      allowed_mentions: {
+        parse: ["everyone", "roles", "users"], // Enable @here, @everyone, role and user mentions
+      },
+    });
   }
 })().catch((e) => {
   console.error(e.stack); // tslint:disable-line

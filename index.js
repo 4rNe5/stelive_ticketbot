@@ -1,7 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const core = require("@actions/core");
-const webhook_1 = require("@slack/webhook");
 const axios_1 = require("axios");
 const qs = require("querystring");
 (async () => {
@@ -11,7 +10,7 @@ const qs = require("querystring");
         "product-id",
         "schedule-id",
         "seat-id",
-        "slack-incoming-webhook-url",
+        "discord-webhook-url",
     ].map((name) => {
         const value = core.getInput(name);
         if (!value) {
@@ -20,7 +19,6 @@ const qs = require("querystring");
         return value;
     });
     const message = (_a = core.getInput("message")) !== null && _a !== void 0 ? _a : "티켓사세요";
-    const webhook = new webhook_1.IncomingWebhook(webhookUrl);
     const res = await axios_1.default({
         method: "POST",
         url: "https://ticket.melon.com/tktapi/product/seatStateInfo.json",
@@ -41,7 +39,13 @@ const qs = require("querystring");
         const link = `http://ticket.melon.com/performance/index.htm?${qs.stringify({
             prodId: productId,
         })}`;
-        await webhook.send(`${message} ${link}`);
+        // Send Discord webhook notification
+        await axios_1.default.post(webhookUrl, {
+            content: `${message} ${link}`,
+            allowed_mentions: {
+                parse: ["everyone", "roles", "users"],
+            },
+        });
     }
 })().catch((e) => {
     console.error(e.stack); // tslint:disable-line
