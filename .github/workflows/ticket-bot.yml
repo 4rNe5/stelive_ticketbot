@@ -1,0 +1,60 @@
+name: STELLIVE Ticket Bot
+on:
+  schedule:
+    # 5분마다 실행 (UTC 기준)
+    - cron: '*/5 * * * *'
+
+  # 수동 실행 가능
+  workflow_dispatch:
+
+jobs:
+  check-s-seat:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Check S Seat Availability
+        uses: docker://ghcr.io/4rne5/stelive_ticketbot:latest
+        with:
+          product-id: '211981'
+          schedule-id: '100001'
+          seat-id: '1_0'
+          discord-webhook-url: ${{ secrets.DISCORD_WEBHOOK_URL }}
+          message: '@here [S석 195,000원] STELLIVE 티켓 나왔어요! 빨리 들어가세요!'
+
+  check-a-seat:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Check A Seat Availability
+        uses: docker://ghcr.io/4rne5/stelive_ticketbot:latest
+        with:
+          product-id: '211981'
+          schedule-id: '100001'
+          seat-id: '2_0'
+          discord-webhook-url: ${{ secrets.DISCORD_WEBHOOK_URL }}
+          message: '@here [A석 185,000원] STELLIVE 티켓 나왔어요! 빨리 들어가세요!'
+
+  check-b-seat:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Check B Seat Availability
+        uses: docker://ghcr.io/4rne5/stelive_ticketbot:latest
+        with:
+          product-id: '211981'
+          schedule-id: '100001'
+          seat-id: '3_0'
+          discord-webhook-url: ${{ secrets.DISCORD_WEBHOOK_URL }}
+          message: '@here [B석 175,000원] STELLIVE 티켓 나왔어요! 빨리 들어가세요!'
