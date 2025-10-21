@@ -28,7 +28,10 @@ import * as qs from "querystring";
     },
     headers: {
       "Content-Type": "application/x-www-form-urlencoded",
+      "Accept": "application/json, text/javascript, */*; q=0.01",
       "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+      "X-Requested-With": "XMLHttpRequest",
+      "Referer": `http://ticket.melon.com/performance/index.htm?prodId=${productId}`,
     },
     data: qs.stringify({
       prodId: productId,
