@@ -17,7 +17,7 @@ jobs:
         uses: actions/checkout@v3
 
       - name: Check S Seat Availability
-        uses: docker://ghcr.io/4rne5/stelive_ticketbot:latest
+        uses: ./
         with:
           product-id: '211981'
           schedule-id: '100001'
@@ -34,7 +34,7 @@ jobs:
         uses: actions/checkout@v3
 
       - name: Check A Seat Availability
-        uses: docker://ghcr.io/4rne5/stelive_ticketbot:latest
+        uses: ./
         with:
           product-id: '211981'
           schedule-id: '100001'
@@ -51,7 +51,7 @@ jobs:
         uses: actions/checkout@v3
 
       - name: Check B Seat Availability
-        uses: docker://ghcr.io/4rne5/stelive_ticketbot:latest
+        uses: ./
         with:
           product-id: '211981'
           schedule-id: '100001'
