@@ -20,6 +20,8 @@ import * as qs from "querystring";
 
   const message = core.getInput("message") ?? "티켓사세요";
 
+  console.log("Requesting with params:", { productId, scheduleId, seatId });
+
   const res = await axios({
     method: "POST",
     url: "https://ticket.melon.com/tktapi/product/seatStateInfo.json",
@@ -40,15 +42,23 @@ import * as qs from "querystring";
       volume: 1,
       selectedGradeVolume: 1,
     }),
+    validateStatus: () => true, // Don't throw on any status code
   });
 
   // tslint:disable-next-line
-  console.log("Got response: ", res.data);
+  console.log("Got response status:", res.status);
+  console.log("Got response data:", JSON.stringify(res.data));
+
+  if (res.status !== 200) {
+    throw new Error(`API returned status ${res.status}: ${JSON.stringify(res.data)}`);
+  }
 
   if (res.data.chkResult) {
     const link = `http://ticket.melon.com/performance/index.htm?${qs.stringify({
       prodId: productId,
     })}`;
+
+    console.log("Tickets available! Sending Discord notification...");
 
     // Send Discord webhook notification
     await axios.post(webhookUrl, {
@@ -57,8 +67,17 @@ import * as qs from "querystring";
         parse: ["everyone", "roles", "users"], // Enable @here, @everyone, role and user mentions
       },
     });
+
+    console.log("Discord notification sent!");
+  } else {
+    console.log("No tickets available (chkResult: false)");
   }
 })().catch((e) => {
+  console.error("Error occurred:", e.message); // tslint:disable-line
+  if (e.response) {
+    console.error("Response status:", e.response.status);
+    console.error("Response data:", e.response.data);
+  }
   console.error(e.stack); // tslint:disable-line
   core.setFailed(e.message);
 });
